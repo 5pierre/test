@@ -1,5 +1,7 @@
 
 
+
+
 winget install EclipseAdoptium.Temurin.21.JDK
 
 ./gradlew build
@@ -14,4 +16,8 @@ docker tag rentalservice 5pierre/rentalservice:v1
 
 docker run
 
+docker images
 
+docker tag rentalservice 5pierre/rentalservice:v1
+
+docker push 5pierre/rentalservice:v1
