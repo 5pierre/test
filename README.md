@@ -12,10 +12,11 @@ powershell
 java -version
 ### 4. Tester
 
-cd C:\Users\marin\Desktop\cours\docker\ingnum\RentalService
+cd C:\Users\plli\Desktop\cours\docker\ingnum\RentalService
 .\gradlew build
-dir build\libs
-& "C:\Program Files\Eclipse Adoptium\jdk-21\bin\java.exe" -jar build\libs\RentalService-0.0.1-SNAPSHOT.jar
+
+java -jar build/libs/RentalService-0.0.1-SNAPSHOT.jar  
+
 - tester dans le navigateur : http://localhost:8080/bonjour
 
 ## Partie 2: Lancer le projet avec Docker
