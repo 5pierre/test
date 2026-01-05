@@ -1,0 +1,41 @@
+
+
+# Ecrivez un docker-compose pour builder et démarrer vos conteneurs (conteneurs sont indépendants). Testez vos services indépendants avec un navigareur.
+ 
+# Modifier les programmes pour qu'ils communiquent.
+ 
+
+version: '3.8'
+
+services:
+  rental-service:
+    build:
+      context: ./rental-service
+      dockerfile: Dockerfile
+    container_name: rental-service
+    ports:
+      - "8080:8080"
+    networks:
+      - microservices-network
+    depends_on:
+      - firstname-service
+    restart: unless-stopped
+
+
+
+  firstname-service:
+    build:
+      context: ./firstname-service
+      dockerfile: Dockerfile
+    container_name: firstname-service
+    ports:
+      - "8081:80"
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+networks:
+  microservices-network:
+    driver: bridge
+
+    # docker-compose down -v
