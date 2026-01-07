@@ -1,8 +1,7 @@
 package com.ingnum.rentalservice.controller;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -10,42 +9,74 @@ import org.springframework.web.client.RestTemplate;
 public class BonjourController {
 
     private final RestTemplate restTemplate;
-    private final String firstnameServiceUrl;
+    private final String phpServiceUrl;
 
-    // Injection du RestTemplate et de l'URL via le constructeur
+    // --- CONSTRUCTEUR (Doit avoir le même nom que la classe) ---
     public BonjourController(RestTemplate restTemplate,
-                             @Value("${firstname.service.url:http://firstname-service/index.php}") String firstnameServiceUrl) {
+                             @Value("${firstname.service.url:http://firstname-service/index.php}") String phpServiceUrl) {
         this.restTemplate = restTemplate;
-        this.firstnameServiceUrl = firstnameServiceUrl;
+        this.phpServiceUrl = phpServiceUrl;
     }
 
+    // --- PARTIE 1 : Communication avec le PHP ---
+    
     @GetMapping("/bonjour")
     public String bonjour() {
         String firstname = "inconnu";
-
         try {
-            // Appel au microservice PHP
-            FirstnameResponse response = restTemplate.getForObject(firstnameServiceUrl, FirstnameResponse.class);
+            // Appel au microservice PHP via son nom Docker
+            FirstnameResponse response = restTemplate.getForObject(phpServiceUrl, FirstnameResponse.class);
             
             if (response != null && response.getFirstname() != null) {
                 firstname = response.getFirstname();
             }
-
         } catch (RestClientException e) {
-            // En cas d'erreur (PHP éteint, mauvaise URL), on affiche l'erreur dans la console serveur
-            System.err.println("Erreur lors de l'appel au service PHP : " + e.getMessage());
+            // Log de l'erreur dans la console pour debugger si besoin
+            System.err.println("Erreur appel PHP : " + e.getMessage());
         }
-
         return "bonjour " + firstname;
     }
 
-    // Classe interne statique pour mapper le JSON { "firstname": "Jean" }
+    // --- PARTIE 2 : Les routes demandées (Customer & Rentals) ---
+
+    /**
+     * URL : http://localhost:8080/customer/{name}
+     */
+    @GetMapping("/customer/{name}")
+    public String getCustomer(@PathVariable String name) {
+        return "Bonjour " + name;
+    }
+
+    @GetMapping("/api/rentals")
+    public String getRentals() {
+        return "GET → Java : liste des locations";
+    }
+
+    @PostMapping("/api/rentals")
+    public String createRental(@RequestBody String body) {
+        return "POST → Java : création location " + body;
+    }
+
+    @PutMapping("/api/rentals/{id}")
+    public String updateRental(@PathVariable int id, @RequestBody String body) {
+        return "PUT → Java : remplacement location " + id;
+    }
+
+    @PatchMapping("/api/rentals/{id}")
+    public String patchRental(@PathVariable int id, @RequestBody String body) {
+        return "PATCH → Java : modification partielle location " + id;
+    }
+
+    @DeleteMapping("/api/rentals/{id}")
+    public String deleteRental(@PathVariable int id) {
+        return "DELETE → Java : suppression location " + id;
+    }
+
+    // --- CLASSE INTERNE (DTO pour le JSON) ---
     public static class FirstnameResponse {
         private String firstname;
 
-        // Constructeur vide nécessaire pour la désérialisation JSON
-        public FirstnameResponse() {
-        }
+        public FirstnameResponse() { }
 
         public String getFirstname() {
             return firstname;

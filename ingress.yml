@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: myservice.info
+      http:
+        paths:
+          - path: /rental(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: rental-service
+                port:
+                  number: 8080
+          - path: /firstname(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: firstname-service
+                port:
+                  number: 80
